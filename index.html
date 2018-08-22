@@ -1,0 +1,47 @@
+<html>
+<head>
+<title>Offline Pizza</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.01,maximum-scale=1.0,user-scalable=0,minimal-ui"> 
+<meta name="apple-mobile-web-app-title" content="Offline Pizza">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="shortcut icon" href="favicon.ico"/>
+<link rel="apple-touch-icon-precomposed" sizes="120x120" href="favicon.png" />
+<style>
+html, body {overflow-x: hidden; position: fixed;}
+body {position: relative}
+* {
+  -webkit-touch-callout:none;
+  -webkit-text-size-adjust:none;
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
+  -webkit-user-select:none;
+}
+canvas {
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -o-crisp-edges;
+  image-rendering: optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+</style>
+</head>
+<body marginwidth="0" marginheight="0" bgcolor="#000"></body>
+
+<script src="engine.js"></script>
+<script src="collider.js"></script>
+<script src="camera.js"></script>
+
+<script src="player.js"></script>
+
+<!--
+<script src="gametitle.js"></script>
+<script src="gameover.js"></script>
+<script src="background.js"></script>
+<script src="floor.js"></script>
+<script src="explosion.js"></script>
+<script src="rock.js"></script>
+<script src="prize.js"></script>
+-->
+<script src="gamemanager.js"></script>
+<script src="game.js"></script>
+</html>

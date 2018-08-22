@@ -1,0 +1,5 @@
+[1534923912] [error] [client 0.0.0.0] p: duplicate option
+[1534923912] [error] [client 0.0.0.0] r: duplicate option
+[1534923914] [error] [client 127.0.0.1] GET /favicon.ico: Error 404: Not Found
+[1534925852] [error] [client 127.0.0.1] GET /gamemanager.js: Error 404: Not Found
+[1534925853] [error] [client 127.0.0.1] GET /gamemanager.js: Error 404: Not Found
