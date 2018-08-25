@@ -10,12 +10,14 @@ g.init = function() {
     g.ui.canvas0 = document.createElement("canvas");
     g.ctx0 = g.ui.canvas0.getContext("2d");
     
-	g.ui.scale = {x: 2, y: 2};
-    g.ui.canvas.width=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.x;
+    g.ui.hudWidth = 100;
+    g.ui.scale = {x: 2, y: 2};
+    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.blockSize*g.ui.scale.x;
     g.ui.canvas.height=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
     g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y + "px";
 
+	g.ctx.translate(g.ui.hudWidth, 0);
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
 	// We want pixelated scaling:
 	g.ctx.imageSmoothingEnabled=false
@@ -82,7 +84,7 @@ g.preGameRender = function(ctx) {
 };
 g.postGameRender = function(ctx) {
     // Draw background
-    g.minimap.draw();
+    g.minimap.draw(ctx);
 };
 g.loadMap = function() {
     let canvas = document.createElement("canvas");
@@ -140,7 +142,7 @@ g.drawMap = function() {
             // Sea, Sand and Grass alpha variations
             if (g.map[y][x]==0) ctx.globalAlpha=0.9 + rand*0.1;
             if (g.map[y][x]==1) ctx.globalAlpha=0.5 + rand*0.4;
-            if (g.map[y][x]==2) ctx.globalAlpha=0.7 + rand*0.3;
+            //if (g.map[y][x]==2) ctx.globalAlpha=0.7 + rand*0.3;
             if (g.map[y][x]==0) { // Sea variations
                 if (rand<0.25) y1 = 1;
             }
@@ -161,11 +163,18 @@ g.drawMap = function() {
                 g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize}));
             }
             if (g.map[y][x]==2) { // Grass variations
+                ctx.drawImage(spriteSheet, 2*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
+                continue; // No house
                 if (rand<0.5) y1 = 1;
                 else if (rand<0.6) y1 = 2;
                 else if (rand<0.7) y1 = 3;
             }
-            if (g.map[y][x]==15 || g.map[y][x]==16) { // Building
+            if (g.map[y][x]==15) { // Pizzeria
+                g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                y2 = 2;
+                y3 = 1;
+            }
+            if (g.map[y][x]==16) { // High building
                 g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
                 y2 = 2;
                 y3 = 1;

@@ -2,7 +2,8 @@ function Player(options) {
 	this.x = options.x || 0;
 	this.y = options.y || 0;
 	this.w = options.w || g.ui.blockSize;
-	this.h = options.h || g.ui.blockSize;
+    this.h = options.h || g.ui.blockSize;
+    this.pizzas = [];
     this.sprite = new Sprite({sprite: "spritemap", w: this.w, h: this.h, offX: 32*4, offY: 96, scale: 1});
     this.collider=0;
     this.tag='player';
@@ -38,7 +39,6 @@ Player.prototype.renderer = function(ctx) {
         case 2: offY = -g.ui.blockSize; break;
         case 3: offY = g.ui.blockSize;  break;
     }
-    dp(offX, offY)
     ctx.ellipse(this.x+offX, this.y+offY, g.ui.blockSize/2.5, g.ui.blockSize/5, 0, 0, 2 * Math.PI);
     ctx.fill();
     }
@@ -73,9 +73,7 @@ Player.prototype.move = function(dir) {
     }
 }
 Player.prototype.shoot = function() {
-    let off = {x: Math.sign(this.speed.x), y: Math.sign(this.speed.y)}
-    if (off.x==0 && off.y==0) off.x=1; // No bullet if we're not moving
-    g.scene.add(new Bullet({x: g.player.x+off.x*g.ui.blockSize/3, y: g.player.y+off.y*g.ui.blockSize/3, speed: off, velocity: this.bulletSpeed}));
+    this.stop();
 }
 Player.prototype.stop = function() {
     this.speed={x: 0, y:0};
