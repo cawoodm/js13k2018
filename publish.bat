@@ -10,14 +10,15 @@ git add .
 git commit -m %STR%
 git push origin master
 
-GOTO END
+
 :: Copy to local cawoodm github site
-COPY /Y .\release\*.* ..\..\..\cawoodm.github.io\js13k2018
+COPY /Y *.* ..\..\..\cawoodm.github.io\js13k2018
+COPY /Y resources\*.* ..\..\..\cawoodm.github.io\js13k2018\resources
 
 :: Publish to github
 CD ..\..\..\cawoodm.github.io\js13k2018
 git add .
-git commit -m "Release %STR%"
+git commit -m %STR%
 git push origin master
 ECHO "Ready to test at http://cawoodm.github.io/js13k2018/"
 START http://cawoodm.github.io/js13k2018/

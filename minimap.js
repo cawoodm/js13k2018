@@ -8,9 +8,10 @@ MiniMap.prototype.draw = function(ctx) {
         let x = e.x/g.ui.blockSize;
         let y = e.y/g.ui.blockSize;
         let sz = 1;
-        if (e.tag=="player") g.ctx.fillStyle='red'
-        else if (e.flashing && g.manager.flash) {g.ctx.fillStyle='white';sz=2}
+        if (e.tag=="player") {
+            g.ctx.fillStyle='red';sz=g.manager.flash?2:1;
+        } else if (e.flashing && g.manager.flash) {g.ctx.fillStyle='white';sz=2}
         else g.ctx.fillStyle='rgba(100,100,100,0.75)'
-        g.ctx.fillRect(g.camera.x+x,g.camera.y+y, sz, sz)
+        g.ctx.fillRect(g.camera.x+x-sz/2,g.camera.y+y-sz/2, sz, sz)
     });
 }
