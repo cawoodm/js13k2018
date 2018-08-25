@@ -4,13 +4,14 @@ function Player(options) {
 	this.w = options.w || g.ui.blockSize;
 	this.h = options.h || g.ui.blockSize;
     this.sprite = new Sprite({sprite: "spritemap", w: this.w, h: this.h, offX: 32*4, offY: 96, scale: 1});
-    this.collider=2;
+    this.collider=0;
     this.tag='player';
     this.acc={x:0, y:0};
     this.speed={x:0, y:0};
     this.velocity = options.velocity || 5;
     this.frame=0;
     this.bulletSpeed=15;
+    g.collider.check(this, ["house", "block"], (e1, e2)=>{g.player.stop()}) 
     return this;
 }
 Player.prototype.update = function(delta) {
@@ -40,12 +41,13 @@ Player.prototype.move = function(dir) {
     this.nextMove = null;
     if (dir.x*this.velocity==this.speed.x && dir.y*this.velocity==this.speed.y) return this.stop();
     let oldSpeed = {x: this.speed.x, y: this.speed.y};
-    let ghost = {x: this.x, y: this.y, speed: {x: dir.x*this.velocity, y: dir.y*this.velocity}}
-    let wouldCollide = Collider.collide(ghost, "wall", 2);
-    let isColliding = Collider.collide(this, "wall", 1);
+    let ghost = {tag: "ghost", x: this.x, y: this.y, w: this.w, h: this.h, speed: {x: dir.x*this.velocity, y: dir.y*this.velocity}}
+    let wouldCollide = Collider.collide(ghost, ["house", "block"], 0);
+    let isColliding = Collider.collide(this, ["house", "block"], 1);
     let stationary = this.speed.x+this.speed.y==0;
     // Move up/down only if on X-grid (left/right)
     let onGrid = (dir.y!==0 && this.x % g.ui.blockSize == 0)||(dir.x!==0 && this.y % g.ui.blockSize == 0);
+    //dp( this.x % g.ui.blockSize == 0)
     //dp(isColliding, wouldCollide, stationary, onGrid, this.x, this.x);
     if (isColliding && wouldCollide) {
         // Do nothing

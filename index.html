@@ -7,8 +7,8 @@
 <link rel="shortcut icon" href="favicon.ico"/>
 <link rel="apple-touch-icon-precomposed" sizes="120x120" href="favicon.png" />
 <style>
-html, body {overflow-x: hidden; position: fixed;}
-body {position: relative}
+html, body {overflow-x: hidden; }
+body {width: 100%;background-color: black;}
 * {
   -webkit-touch-callout:none;
   -webkit-text-size-adjust:none;
@@ -22,25 +22,23 @@ canvas {
   image-rendering: -o-crisp-edges;
   image-rendering: optimize-contrast;
   -ms-interpolation-mode: nearest-neighbor;
+  margin: 0 auto;
 }
 </style>
 </head>
-<body marginwidth="0" marginheight="0" bgcolor="#000"></body>
+<body marginwidth="0" marginheight="0"></body>
 
 <script src="engine.js"></script>
 <script src="collider.js"></script>
 <script src="camera.js"></script>
 
 <script src="player.js"></script>
+<script src="house.js"></script>
 
 <!--
 <script src="gametitle.js"></script>
 <script src="gameover.js"></script>
-<script src="background.js"></script>
-<script src="floor.js"></script>
 <script src="explosion.js"></script>
-<script src="rock.js"></script>
-<script src="prize.js"></script>
 -->
 <script src="gamemanager.js"></script>
 <script src="game.js"></script>

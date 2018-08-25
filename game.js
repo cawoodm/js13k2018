@@ -24,47 +24,39 @@ g.init = function() {
 	return ()=>{g.ready()}
 }
 g.ready = function() {
-    g.loadMap();
-    g.drawMap();
     g.restart(false)
 };
 g.restart = function(title) {
 	// Cleanup
 	g.Halt();
-	g.scene = new g.Scene();
+    g.scene = new g.Scene();
+    g.loadMap();
+    g.drawMap();
 	g.level=0;
 	if (title) {
         g.state="title";
 		g.scene.add(new GameTitle());
 	} else {
         // New Game
-        g.scene = new g.Scene();
-        g.camera = g.scene.add(new Camera({w: g.ui.blocksInView*g.ui.blockSize, h: g.ui.blocksInView*g.ui.blockSize, box: 200}));
-        //g.collider = g.scene.add(new Collider);
+        g.camera = g.scene.add(new Camera({x: 24*g.ui.blockSize, w: g.ui.blocksInView*g.ui.blockSize, h: g.ui.blocksInView*g.ui.blockSize, box: 200}));
+        g.collider = g.scene.add(new Collider);
 		g.manager = g.scene.add(new GameManager());
-        g.player = g.scene.add(new Player({velocity: 2}));
-        g.state="play";
+        g.player = g.scene.add(new Player({x: 28*g.ui.blockSize, y: 37*g.ui.blockSize, velocity: 2}));
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
-		//g.collider = new Collider;
-//g.loadScene();
+        g.loadScene();
+        g.state="play";
 	}
 	g.Start();
 };
 g.loadScene = function(level) {
-	if (g.level >= g.levels.length-1) return false;
-	// Get our grid
-	let grid = g.levels[level];
-
-	// Add grass
-	g.scene.add(new Sprite({x: 0, y: 0, tag: 'grass', sprite: 'grass', w: g.ui.width, h: g.ui.height+g.ui.blockSize, scale:1}));
-
-	// Place objects on grid
-	for (let j=0; j<g.ui.gridHeight; j++) for (let i=0; i<g.ui.gridWidth; i++) {switch(grid[i][j]) {
-		case 1: g.scene.add(new Wall({x: i*g.ui.blockSize, y:j*g.ui.blockSize, size: g.ui.blockSize})); break;
-		case 2: g.scene.add(new Apple({x: i*g.ui.blockSize, y: j*g.ui.blockSize})); break;
-		case 3: g.scene.add(new Bee({x: i*g.ui.blockSize, y: j*g.ui.blockSize, velocity: 3+(level/3)})); break;
-		case 9: g.scene.add(new Player({x: i*g.ui.blockSize, y: j*g.ui.blockSize})); break;
+    let mapWidth = g.map[0].length;
+    let mapHeight = g.map.length;
+	for (let y = 0; y < mapHeight; y++) for (let x = 0; x < mapWidth; x++) {switch(g.map[y][x]) {
+		//case 3: g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize})); break;
+		//case -1: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
+		//case 15: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
+		//case 16: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
 	}}
 	return true;
 }
@@ -145,20 +137,35 @@ g.drawMap = function() {
             if (g.map[y][x]==0) { // Sea variations
                 if (rand<0.25) y1 = 1;
             }
+            if (g.map[y][x]==1) { // Sand variations
+                if (rand<0.25) y1 = 1;
+                //g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+            }
             if (g.map[y][x]==3) { // House variations
                 if (rand<0.25) y1 = 1; // Red House
                 else if (rand<0.50) y1 = 2; // Black house
-                else if (rand<0.60) continue; // No house
                 else if (rand<0.75) y1 = 3; // Green house
+                else {
+                    // Block 
+                    g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize})
+                    g.map[y][x]=-1 
+                    continue; // No house
+                }
+                g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize}));
             }
             if (g.map[y][x]==2) { // Grass variations
                 if (rand<0.5) y1 = 1;
                 else if (rand<0.6) y1 = 2;
                 else if (rand<0.7) y1 = 3;
             }
-            if (g.map[y][x]>=15) { // Building
+            if (g.map[y][x]==15 || g.map[y][x]==16) { // Building
+                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
                 y2 = 2;
                 y3 = 1;
+            }
+            if (g.map[y][x]==17) { // Block
+                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                continue;
             }
             ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
         }
@@ -173,19 +180,23 @@ g.ui.keys = {
 	,debug: Keyboard("clickCtrl") // Mouse click
 };
 g.ui.keys.left.down = function() {
-	if (g.state!="play") return;
+    if (g.state=="pause") return g.Pause();
+    if (g.state!="play") return;
 	g.player.move(Vector.left())
 };
 g.ui.keys.right.down = function() {
+    if (g.state=="pause") return g.Pause();
 	if (g.state!="play") return;
 	g.player.move(Vector.right())
 };
 g.ui.keys.up.down = function() {
-	if (g.state!="play") return;
+    if (g.state=="pause") return g.Pause();
+    if (g.state!="play") return;
 	g.player.move(Vector.up())
 };
 g.ui.keys.down.down = function() {
-	if (g.state!="play") return;
+    if (g.state=="pause") return g.Pause();
+    if (g.state!="play") return;
 	g.player.move(Vector.down())
 };
 g.ui.keys.fire.press = function(e) {

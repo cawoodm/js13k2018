@@ -14,7 +14,6 @@ g.ui.win = {
     ,height: window.innerHeight||document.documentElement.clientHeight||document.body.offsetHeight
 };
 document.body.style.padding=document.body.style.margin="0px";
-document.body.style.backgroundColor="#fff";
 document.body.style.width=window.innerWidth+'px'
 document.body.style.height=window.innerHeight+'px'
 g.ui.canvas = document.createElement("canvas");
@@ -72,7 +71,7 @@ Ticker.prototype.loop = function() {
     this.actualFPS = 1000/drawDiff;
     let updateDiff = now - this.lastUpdate||0;
 	// 2s passed without drawing -> halt game
-	if (drawDiff>2000) g.Pause();//return this.state="stop";
+	if (drawDiff>20000) g.Pause();//return this.state="stop";
 	this._updateCallBack(updateDiff/this._frameMillis);
 	this.lastUpdate = now;
 	// if enough time has elapsed, draw the next frame
@@ -174,7 +173,7 @@ g.Scene.prototype.remove = function(ent) {
 g.Scene.prototype.get = function(tag) {
 	result=[];
 	this.entities.forEach(function(ent) {
-		if (!tag || ent.tag === tag) result.push(ent);
+		if (!tag || ent.tag === tag || Array.isArray(tag) && tag.includes(ent.tag)) result.push(ent);
 	}, this);
 	return result;
 };
