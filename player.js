@@ -27,11 +27,21 @@ Player.prototype.update = function(delta) {
     else if (this.speed.y>0) this.frame=3;
 }
 Player.prototype.renderer = function(ctx) {
+    if (false) {
     // Drop shadow
     ctx.beginPath();
     ctx.fillStyle="rgba(100,100,100,0.5)"
-    ctx.ellipse(this.x+g.ui.blockSize/2, this.y+g.ui.blockSize, g.ui.blockSize/2.5, g.ui.blockSize/5, 0, 0, 2 * Math.PI);
+    let offX = 0, offY = 0;
+    switch (this.frame) {
+        case 0: offX = g.ui.blockSize; offY=g.ui.blockSize*0.75; break;
+        case 1: offX = -g.ui.blockSize*0.25; offY=g.ui.blockSize*0.25; break;
+        case 2: offY = -g.ui.blockSize; break;
+        case 3: offY = g.ui.blockSize;  break;
+    }
+    dp(offX, offY)
+    ctx.ellipse(this.x+offX, this.y+offY, g.ui.blockSize/2.5, g.ui.blockSize/5, 0, 0, 2 * Math.PI);
     ctx.fill();
+    }
     this.sprite.x=this.x;
     this.sprite.y=this.y;
     this.sprite.offX=g.ui.blockSize*4+this.frame*(g.ui.blockSize);

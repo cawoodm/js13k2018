@@ -6,17 +6,11 @@ function House(options) {
     this.tag = "house";
     this.lastFlash = 0  ;
     this.flashing = false;
-    this.flash = false;
     return this;
 }
-House.prototype.update = function(dt) {
-    if (this.flashing && g.ticker.ticks-this.lastFlash>30) {
-        this.flash = !this.flash;
-        this.lastFlash = g.ticker.ticks;
-    }
-}
+//House.prototype.update = function(dt) {}
 House.prototype.renderer = function(ctx) {
-    if (this.flash) {
+    if (this.flashing && g.manager.flash) {
         ctx.strokeStyle='#fff';
         ctx.lineWidth='3';
         ctx.strokeRect(this.x, this.y, this.w, this.h)

@@ -3,11 +3,11 @@ SETLOCAL
 
 CD %dp0%
 SET STR=%1
-IF "%1"=="" SET STR=%date% %time%
+::IF "%1"=="" SET STR=%date% %time%
 
 :: Commit local changes
 git add .
-git commit -m "Build %STR%"
+git commit -m %STR%
 git push origin master
 
 GOTO END

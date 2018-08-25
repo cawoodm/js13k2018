@@ -13,6 +13,8 @@ g.init = function() {
 	g.ui.scale = {x: 2, y: 2};
     g.ui.canvas.width=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.x;
     g.ui.canvas.height=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y;
+    g.ui.canvas.style.position = "absolute";
+    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y + "px";
 
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
 	// We want pixelated scaling:
@@ -41,6 +43,7 @@ g.restart = function(title) {
         g.camera = g.scene.add(new Camera({x: 24*g.ui.blockSize, w: g.ui.blocksInView*g.ui.blockSize, h: g.ui.blocksInView*g.ui.blockSize, box: 200}));
         g.collider = g.scene.add(new Collider);
 		g.manager = g.scene.add(new GameManager());
+		g.minimap = g.scene.add(new MiniMap());
         g.player = g.scene.add(new Player({x: 28*g.ui.blockSize, y: 37*g.ui.blockSize, velocity: 2}));
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
@@ -76,6 +79,10 @@ g.gameOver = function() {
 g.preGameRender = function(ctx) {
     // Draw background
     g.ctx.drawImage(g.ui.canvas0, g.camera.x, g.camera.y, 320, 320, 0, 0, 320, 320)
+};
+g.postGameRender = function(ctx) {
+    // Draw background
+    g.minimap.draw();
 };
 g.loadMap = function() {
     let canvas = document.createElement("canvas");
