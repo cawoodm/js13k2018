@@ -19,10 +19,6 @@ document.body.style.height=window.innerHeight+'px'
 g.ui.canvas = document.createElement("canvas");
 document.body.appendChild(g.ui.canvas);
 g.ctx = g.ui.canvas.getContext("2d");
-//g.ctx.imageSmoothingEnabled=false;
-// Canvas must exactly fit window or we have mobile swipe woes
-g.ui.canvas.width=g.ui.win.width;
-g.ui.canvas.height=g.ui.win.height;
 
 // ImageLoader: Handles image loading
 g.ImageLoader = {
@@ -199,7 +195,6 @@ g.Pause=function() {
 		g.ticker.start();
 	} else {
 		g.ticker.stop();
-		if (g.sounds && g.sounds.music) g.sounds.music.pause();
 		g.state="pause";
 	}
 };

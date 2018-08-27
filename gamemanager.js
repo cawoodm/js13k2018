@@ -1,7 +1,6 @@
 function GameManager(options) {
     this.static = true;
     this.flash = false;
-    this.lastFlash = 0;
     this.level = 1;
     this.houses = g.scene.get("house")
     shuffleArray(this.houses)
@@ -10,24 +9,31 @@ function GameManager(options) {
 }
 GameManager.prototype.update = function(dt) {
     if (g.ticker.ticks % 30 == 0) {
-        if (this.prospects.length < 2* this.level) this.findProspect();
+        if (this.prospects.length < 2* this.level) this.getNewHungryHouse();
         this.flash = !this.flash;
     }
-    //if (g.ticker.ticks-this.lastFlash>30) {
-//        this.lastFlash = g.ticker.ticks;
-  //  }
 }
 GameManager.prototype.renderer = function(ctx) {
-    //ctx.fillText(Math.round(g.ticker.actualFPS), 30, 30)
+    ctx.fillStyle = 'white'
+    ctx.fillText(Math.round(g.ticker.actualFPS/10)+"0", 10, 10)
 }
-GameManager.prototype.findProspect = function() {
+GameManager.prototype.vanStops = function() {
+    this.prospects.forEach((h)=>{
+        if (Math.round(h.distanceFrom(g.player)) <= 1) {
+            h.placeOrder();
+        }
+    });
+    if (Math.round(g.player.distanceFrom(g.pizzeria)) <= 1) {
+        dp("home")
+    }
+}
+GameManager.prototype.getNewHungryHouse = function() {
     for (i=0; i<this.houses.length; i++) {
         let h = this.houses[i];
         if (this.prospects.includes(h)) continue;
-        // Is this house within 10 x level blocks of the pizzeria?
-        if (Math.sqrt(Math.pow(g.pizzeria.x-h.x,2)+Math.pow(g.pizzeria.y-h.y,2))/g.ui.blockSize < this.level*10) {
-            h.flashing = true;
-            return this.prospects.push(h)
+        // Is this house within 5 x level blocks of the pizzeria?
+        if (h.distanceFrom(g.pizzeria) < this.level*5) {
+            return this.prospects.push(h.readyToOrder())
         }
     }
 }

@@ -22,8 +22,8 @@ g.init = function() {
 	// We want pixelated scaling:
 	g.ctx.imageSmoothingEnabled=false
 
-	g.ImageLoader.add("tilemap", "./resources/tilemap.png");
-	g.ImageLoader.add("spritemap", "./resources/spritemap.png");
+	g.ImageLoader.add("tilemap", "./tilemap.png");
+	g.ImageLoader.add("spritemap", "./spritemap.png");
 
 	return ()=>{g.ready()}
 }
