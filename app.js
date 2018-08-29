@@ -86,8 +86,8 @@ Ticker.prototype.stop = function() {this.state="stop";};
 function Sprite(options) {
 	this.x = options.x || 0;
 	this.y = options.y  || 0;
-	this.w = options.w || g.ui.blockSize;
-    this.h = options.h || g.ui.blockSize;
+	this.w = options.w || g.ui.bz;
+    this.h = options.h || g.ui.bz;
     this.offX = options.offX || 0;
     this.offY = options.offY || 0;
     this.scale = options.scale || 1;
@@ -404,8 +404,8 @@ function shuffleArray(array) {
 function House(options) {
     this.x = options.x;
     this.y = options.y;
-    this.w = options.w || g.ui.blockSize;
-    this.h = options.h || g.ui.blockSize;
+    this.w = options.w || g.ui.bz;
+    this.h = options.h || g.ui.bz;
     this.tag = "house";
     this.lastFlash = 0  ;
     this.flashing = false;
@@ -437,7 +437,7 @@ House.prototype.placeOrder = function() {
     return this
 };
 House.prototype.distanceFrom = function(ent) {
-    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.blockSize 
+    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.bz 
 };function MiniMap() {
     return this;
 }
@@ -446,8 +446,8 @@ MiniMap.prototype.draw = function(ctx) {
     ctx.fillStyle='rgba(0,0,0,0.8)'
     ctx.fillRect(g.camera.x+2,g.camera.y+2,40,100)
     g.scene.get(["player", "pizzeria", "house"]).forEach((e)=> {
-        let x = e.x/g.ui.blockSize;
-        let y = e.y/g.ui.blockSize;
+        let x = e.x/g.ui.bz;
+        let y = e.y/g.ui.bz;
         let sz = 1;
         if (e.tag=="player") {
             ctx.fillStyle='red';sz=g.manager.flash?3:1;
@@ -466,8 +466,8 @@ MiniMap.prototype.draw = function(ctx) {
 function Player(options) {
 	this.x = options.x || 0;
 	this.y = options.y || 0;
-	this.w = options.w || g.ui.blockSize;
-    this.h = options.h || g.ui.blockSize;
+	this.w = options.w || g.ui.bz;
+    this.h = options.h || g.ui.bz;
     this.pizzas = [];
     this.sprite = new Sprite({sprite: "spritemap", w: this.w, h: this.h, offX: 32*4, offY: 96, scale: 1});
     this.collider=0;
@@ -499,17 +499,17 @@ Player.prototype.renderer = function(ctx) {
     ctx.fillStyle="rgba(100,100,100,0.5)"
     let offX = 0, offY = 0;
     switch (this.frame) {
-        case 0: offX = g.ui.blockSize; offY=g.ui.blockSize*0.75; break;
-        case 1: offX = -g.ui.blockSize*0.25; offY=g.ui.blockSize*0.25; break;
-        case 2: offY = -g.ui.blockSize; break;
-        case 3: offY = g.ui.blockSize;  break;
+        case 0: offX = g.ui.bz; offY=g.ui.bz*0.75; break;
+        case 1: offX = -g.ui.bz*0.25; offY=g.ui.bz*0.25; break;
+        case 2: offY = -g.ui.bz; break;
+        case 3: offY = g.ui.bz;  break;
     }
-    ctx.ellipse(this.x+offX, this.y+offY, g.ui.blockSize/2.5, g.ui.blockSize/5, 0, 0, 2 * Math.PI);
+    ctx.ellipse(this.x+offX, this.y+offY, g.ui.bz/2.5, g.ui.bz/5, 0, 0, 2 * Math.PI);
     ctx.fill();
     }
     this.sprite.x=this.x;
     this.sprite.y=this.y;
-    this.sprite.offX=g.ui.blockSize*4+this.frame*(g.ui.blockSize);
+    this.sprite.offX=g.ui.bz*4+this.frame*(g.ui.bz);
     this.sprite.renderer(ctx);
 }
 Player.prototype.move = function(dir) {
@@ -521,8 +521,8 @@ Player.prototype.move = function(dir) {
     let isColliding = Collider.collide(this, ["house", "block"], 1);
     let stationary = this.speed.x+this.speed.y==0;
     // Move up/down only if on X-grid (left/right)
-    let onGrid = (dir.y!==0 && this.x % g.ui.blockSize == 0)||(dir.x!==0 && this.y % g.ui.blockSize == 0);
-    //dp( this.x % g.ui.blockSize == 0)
+    let onGrid = (dir.y!==0 && this.x % g.ui.bz == 0)||(dir.x!==0 && this.y % g.ui.bz == 0);
+    //dp( this.x % g.ui.bz == 0)
     //dp(isColliding, wouldCollide, stationary, onGrid, this.x, this.x);
     if (isColliding && wouldCollide) {
         // Do nothing
@@ -545,10 +545,10 @@ Player.prototype.stop = function() {
     g.manager.vanStops();
 }
 Player.prototype.distanceFrom = function(ent) {
-    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.blockSize 
+    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.bz 
 };/*global g*/
 g.init = function() {
-	g.ui.blockSize=32
+	g.ui.bz=32
     g.ui.blocksInView=10
 
     // g.ui.canvas = document.getElementById("c");
@@ -560,10 +560,10 @@ g.init = function() {
     
     g.ui.hudWidth = 100;
     g.ui.scale = {x: 2, y: 2};
-    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.blockSize*g.ui.scale.x;
-    g.ui.canvas.height=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y;
+    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.bz*g.ui.scale.x;
+    g.ui.canvas.height=g.ui.blocksInView*g.ui.bz*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
-    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y + "px";
+    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.bz*g.ui.scale.y + "px";
 
 	g.ctx.translate(g.ui.hudWidth, 0);
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
@@ -590,11 +590,11 @@ g.restart = function(title) {
 		g.scene.add(new GameTitle());
 	} else {
         // New Game
-        g.camera = g.scene.add(new Camera({x: 24*g.ui.blockSize, w: g.ui.blocksInView*g.ui.blockSize, h: g.ui.blocksInView*g.ui.blockSize, box: 200}));
+        g.camera = g.scene.add(new Camera({x: 24*g.ui.bz, w: g.ui.blocksInView*g.ui.bz, h: g.ui.blocksInView*g.ui.bz, box: 200}));
         g.collider = g.scene.add(new Collider);
 		g.manager = g.scene.add(new GameManager());
 		g.minimap = g.scene.add(new MiniMap());
-        g.player = g.scene.add(new Player({x: 28*g.ui.blockSize, y: 37*g.ui.blockSize, velocity: 2}));
+        g.player = g.scene.add(new Player({x: 28*g.ui.bz, y: 37*g.ui.bz, velocity: 2}));
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
         g.loadScene();
@@ -606,10 +606,10 @@ g.loadScene = function(level) {
     let mapWidth = g.map[0].length;
     let mapHeight = g.map.length;
 	for (let y = 0; y < mapHeight; y++) for (let x = 0; x < mapWidth; x++) {switch(g.map[y][x]) {
-		//case 3: g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize})); break;
-		//case -1: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
-		//case 15: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
-		//case 16: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
+		//case 3: g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz})); break;
+		//case -1: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
+		//case 15: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
+		//case 16: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
 	}}
 	return true;
 }
@@ -664,7 +664,7 @@ g.loadMap = function() {
 };
 g.drawMap = function() {
     // Draw static map to hidden canvas0
-    let spriteSize = g.ui.blockSize;
+    let spriteSize = g.ui.bz;
     let mapWidth = g.map[0].length;
     let mapHeight = g.map.length;
     g.ui.canvas0.width = mapWidth * spriteSize;
@@ -696,7 +696,7 @@ g.drawMap = function() {
             }
             if (g.map[y][x]==1) { // Sand variations
                 if (rand<0.25) y1 = 1;
-                //g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                //g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
             }
             if (g.map[y][x]==3) { // House variations
                 if (rand<0.25) y1 = 1; // Red House
@@ -704,11 +704,11 @@ g.drawMap = function() {
                 else if (rand<0.75) y1 = 3; // Green house
                 else {
                     // Block 
-                    g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize})
+                    g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz})
                     g.map[y][x]=-1 
                     continue; // No house
                 }
-                g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize}));
+                g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz}));
             }
             if (g.map[y][x]==2) { // Grass variations
                 ctx.drawImage(spriteSheet, 2*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
@@ -718,17 +718,17 @@ g.drawMap = function() {
                 else if (rand<0.7) y1 = 3;
             }
             if (g.map[y][x]==15) { // Pizzeria
-                g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 y2 = 2;
                 y3 = 1;
             }
             if (g.map[y][x]==16) { // High building
-                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 y2 = 2;
                 y3 = 1;
             }
             if (g.map[y][x]==17) { // Block
-                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 continue;
             }
             ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);

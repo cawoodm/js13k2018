@@ -1,8 +1,8 @@
 function Player(options) {
 	this.x = options.x || 0;
 	this.y = options.y || 0;
-	this.w = options.w || g.ui.blockSize;
-    this.h = options.h || g.ui.blockSize;
+	this.w = options.w || g.ui.bz;
+    this.h = options.h || g.ui.bz;
     this.pizzas = [];
     this.sprite = new Sprite({sprite: "spritemap", w: this.w, h: this.h, offX: 32*4, offY: 96, scale: 1});
     this.collider=0;
@@ -11,7 +11,7 @@ function Player(options) {
     this.speed={x:0, y:0};
     this.velocity = options.velocity || 5;
     this.frame=0;
-    this.bulletSpeed=15;
+    this.carrying=[];
     g.collider.check(this, ["house", "block"], (e1, e2)=>{g.player.stop()}) 
     return this;
 }
@@ -28,24 +28,12 @@ Player.prototype.update = function(delta) {
     else if (this.speed.y>0) this.frame=3;
 }
 Player.prototype.renderer = function(ctx) {
-    if (false) {
-    // Drop shadow
-    ctx.beginPath();
-    ctx.fillStyle="rgba(100,100,100,0.5)"
-    let offX = 0, offY = 0;
-    switch (this.frame) {
-        case 0: offX = g.ui.blockSize; offY=g.ui.blockSize*0.75; break;
-        case 1: offX = -g.ui.blockSize*0.25; offY=g.ui.blockSize*0.25; break;
-        case 2: offY = -g.ui.blockSize; break;
-        case 3: offY = g.ui.blockSize;  break;
-    }
-    ctx.ellipse(this.x+offX, this.y+offY, g.ui.blockSize/2.5, g.ui.blockSize/5, 0, 0, 2 * Math.PI);
-    ctx.fill();
-    }
     this.sprite.x=this.x;
     this.sprite.y=this.y;
-    this.sprite.offX=g.ui.blockSize*4+this.frame*(g.ui.blockSize);
+    this.sprite.offX=g.ui.bz*4+this.frame*(g.ui.bz);
     this.sprite.renderer(ctx);
+    ctx.fillStyle = 'white'
+    ctx.fillText(this.carrying.length, this.x+5, this.y+5)
 }
 Player.prototype.move = function(dir) {
     this.nextMove = null;
@@ -56,8 +44,8 @@ Player.prototype.move = function(dir) {
     let isColliding = Collider.collide(this, ["house", "block"], 1);
     let stationary = this.speed.x+this.speed.y==0;
     // Move up/down only if on X-grid (left/right)
-    let onGrid = (dir.y!==0 && this.x % g.ui.blockSize == 0)||(dir.x!==0 && this.y % g.ui.blockSize == 0);
-    //dp( this.x % g.ui.blockSize == 0)
+    let onGrid = (dir.y!==0 && this.x % g.ui.bz == 0)||(dir.x!==0 && this.y % g.ui.bz == 0);
+    //dp( this.x % g.ui.bz == 0)
     //dp(isColliding, wouldCollide, stationary, onGrid, this.x, this.x);
     if (isColliding && wouldCollide) {
         // Do nothing
@@ -72,13 +60,10 @@ Player.prototype.move = function(dir) {
         this.speed = ghost.speed;
     }
 }
-Player.prototype.shoot = function() {
-    this.stop();
-}
 Player.prototype.stop = function() {
     this.speed={x: 0, y:0};
     g.manager.vanStops();
 }
 Player.prototype.distanceFrom = function(ent) {
-    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.blockSize 
+    return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.bz 
 };

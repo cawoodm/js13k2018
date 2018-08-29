@@ -82,8 +82,8 @@ Ticker.prototype.stop = function() {this.state="stop";};
 function Sprite(options) {
 	this.x = options.x || 0;
 	this.y = options.y  || 0;
-	this.w = options.w || g.ui.blockSize;
-    this.h = options.h || g.ui.blockSize;
+	this.w = options.w || g.ui.bz;
+    this.h = options.h || g.ui.bz;
     this.offX = options.offX || 0;
     this.offY = options.offY || 0;
     this.scale = options.scale || 1;
@@ -91,8 +91,10 @@ function Sprite(options) {
     this.img = g.ImageLoader.get[options.sprite||"sprites"];
     return this;
 }
-Sprite.prototype.renderer = function(ctx) {
-    ctx.save();
+Sprite.prototype.renderer = function(ctx, x, y) {
+	ctx.save();
+	this.x=x||this.x;
+	this.y=y||this.y;
     this.offW = this.w * this.scale;
     this.offH = this.h * this.scale;
     if (this.center) g.ctx.translate(-this.offW/2, -this.offH/2)

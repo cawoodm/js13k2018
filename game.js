@@ -1,6 +1,6 @@
 /*global g*/
 g.init = function() {
-	g.ui.blockSize=32
+	g.ui.bz=32
     g.ui.blocksInView=10
 
     // g.ui.canvas = document.getElementById("c");
@@ -12,10 +12,10 @@ g.init = function() {
     
     g.ui.hudWidth = 100;
     g.ui.scale = {x: 2, y: 2};
-    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.blockSize*g.ui.scale.x;
-    g.ui.canvas.height=g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y;
+    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.bz*g.ui.scale.x;
+    g.ui.canvas.height=g.ui.blocksInView*g.ui.bz*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
-    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.blockSize*g.ui.scale.y + "px";
+    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.bz*g.ui.scale.y + "px";
 
 	g.ctx.translate(g.ui.hudWidth, 0);
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
@@ -42,11 +42,11 @@ g.restart = function(title) {
 		g.scene.add(new GameTitle());
 	} else {
         // New Game
-        g.camera = g.scene.add(new Camera({x: 24*g.ui.blockSize, w: g.ui.blocksInView*g.ui.blockSize, h: g.ui.blocksInView*g.ui.blockSize, box: 200}));
+        g.camera = g.scene.add(new Camera({x: 24*g.ui.bz, w: g.ui.blocksInView*g.ui.bz, h: g.ui.blocksInView*g.ui.bz, box: 200}));
         g.collider = g.scene.add(new Collider);
 		g.manager = g.scene.add(new GameManager());
 		g.minimap = g.scene.add(new MiniMap());
-        g.player = g.scene.add(new Player({x: 28*g.ui.blockSize, y: 37*g.ui.blockSize, velocity: 2}));
+        g.player = g.scene.add(new Player({x: 28*g.ui.bz, y: 37*g.ui.bz, velocity: 2}));
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
         g.loadScene();
@@ -58,10 +58,10 @@ g.loadScene = function(level) {
     let mapWidth = g.map[0].length;
     let mapHeight = g.map.length;
 	for (let y = 0; y < mapHeight; y++) for (let x = 0; x < mapWidth; x++) {switch(g.map[y][x]) {
-		//case 3: g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize})); break;
-		//case -1: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
-		//case 15: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
-		//case 16: g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize}); break;
+		//case 3: g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz})); break;
+		//case -1: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
+		//case 15: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
+		//case 16: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
 	}}
 	return true;
 }
@@ -116,7 +116,7 @@ g.loadMap = function() {
 };
 g.drawMap = function() {
     // Draw static map to hidden canvas0
-    let spriteSize = g.ui.blockSize;
+    let spriteSize = g.ui.bz;
     let mapWidth = g.map[0].length;
     let mapHeight = g.map.length;
     g.ui.canvas0.width = mapWidth * spriteSize;
@@ -128,6 +128,7 @@ g.drawMap = function() {
     let spriteSheet = g.ImageLoader.get["spritemap"];
     
     // Land background is green
+    ctx.globalAlpha=0.7;
     for (let y = 0; y < mapHeight; y++)
         for (let x = 0; x < mapWidth; x++)
             if (g.map[y][x]>2) // If not landscape
@@ -142,13 +143,13 @@ g.drawMap = function() {
             // Sea, Sand and Grass alpha variations
             if (g.map[y][x]==0) ctx.globalAlpha=0.9 + rand*0.1;
             if (g.map[y][x]==1) ctx.globalAlpha=0.5 + rand*0.4;
-            //if (g.map[y][x]==2) ctx.globalAlpha=0.7 + rand*0.3;
+            if (g.map[y][x]==2) ctx.globalAlpha=0.7 //+ rand*0.3;
             if (g.map[y][x]==0) { // Sea variations
                 if (rand<0.25) y1 = 1;
             }
             if (g.map[y][x]==1) { // Sand variations
                 if (rand<0.25) y1 = 1;
-                //g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                //g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
             }
             if (g.map[y][x]==3) { // House variations
                 if (rand<0.25) y1 = 1; // Red House
@@ -156,11 +157,11 @@ g.drawMap = function() {
                 else if (rand<0.75) y1 = 3; // Green house
                 else {
                     // Block 
-                    g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize})
+                    g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz})
                     g.map[y][x]=-1 
                     continue; // No house
                 }
-                g.scene.add(new House({x: x*g.ui.blockSize, y: y*g.ui.blockSize}));
+                g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz}));
             }
             if (g.map[y][x]==2) { // Grass variations
                 ctx.drawImage(spriteSheet, 2*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
@@ -170,17 +171,17 @@ g.drawMap = function() {
                 else if (rand<0.7) y1 = 3;
             }
             if (g.map[y][x]==15) { // Pizzeria
-                g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 y2 = 2;
                 y3 = 1;
             }
             if (g.map[y][x]==16) { // High building
-                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 y2 = 2;
                 y3 = 1;
             }
             if (g.map[y][x]==17) { // Block
-                g.scene.add({tag: "block", x: x*g.ui.blockSize, y: y*g.ui.blockSize, w: g.ui.blockSize, h: g.ui.blockSize});
+                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 continue;
             }
             ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
@@ -192,8 +193,6 @@ g.ui.keys = {
 	,up: Keyboard(["KeyW", "ArrowUp"])
 	,down: Keyboard(["KeyS", "ArrowDown"])
 	,fire: Keyboard("Space") // space
-	,fireM: Keyboard("click") // Mouse click
-	,debug: Keyboard("clickCtrl") // Mouse click
 };
 g.ui.keys.left.down = function() {
     if (g.state=="pause") return g.Pause();
@@ -217,17 +216,6 @@ g.ui.keys.down.down = function() {
 };
 g.ui.keys.fire.press = function(e) {
 	if (g.state=="message") return;
-	if (g.state!="play") return g.restart();
-	if (!e || !e.touches) g.player.shoot();
-	return;
-	x = e.touches[0].clientX / g.ui.scaleX;
-	y = e.touches[0].clientY / g.ui.scaleY;
-	if (y > g.ui.height/4 && y < g.ui.height*3/4) {
-		if (x < g.ui.width/4) return g.ui.keys.left.down()
-		else if (x > g.ui.width*3/4) return g.ui.keys.right.down()
-	} else if (x > g.ui.width/4 && x < g.ui.width*3/4) {
-		if (y < g.ui.height/4) return g.ui.keys.up.down()
-		else if (y > g.ui.height*3/4) return g.ui.keys.down.down()
-	}
+    if (g.state!="play") return g.restart();
+    g.player.stop();
 }
-g.ui.keys.fireM.press = g.ui.keys.fire.press;
