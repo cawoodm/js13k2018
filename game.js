@@ -217,5 +217,5 @@ g.ui.keys.down.down = function() {
 g.ui.keys.fire.press = function(e) {
 	if (g.state=="message") return;
     if (g.state!="play") return g.restart();
-    g.player.stop();
+    g.manager.vanStops();
 }

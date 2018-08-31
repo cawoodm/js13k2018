@@ -62,7 +62,6 @@ Player.prototype.move = function(dir) {
 }
 Player.prototype.stop = function() {
     this.speed={x: 0, y:0};
-    g.manager.vanStops();
 }
 Player.prototype.distanceFrom = function(ent) {
     return Math.sqrt(Math.pow(ent.x-this.x,2)+Math.pow(ent.y-this.y,2))/g.ui.bz 

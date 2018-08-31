@@ -7,15 +7,26 @@ function House(options) {
     this.lastFlash = 0  ;
     this.flashing = false;
     this.state = 0;
+    this.waittime = -1;
+    this.satisfaction = -1;
     this.readySprite = new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*4, offY: 32*1});
     this.orderedSprite = new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*5, offY: 32*1});
+    this.sat = [new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*5, offY: 32*2}),
+        new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*6, offY: 32*2}),
+        new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*4, offY: 32*2})
+    ];
     return this;
 };
 House.prototype.update = function(dt) {
     if (g.ticker.ticks % 60 == 0) {
         // Approx every second
-        if (this.state==2) {
-            this.waittime++;
+        if (this.state==1) this.waittime+=0.5;
+        if (this.state==2) this.waittime++;
+        
+        if (this.waittime>=0) {
+            if (this.waittime/this.patience<0.5) this.satisfaction=2;
+            else if (this.waittime < this.patience) this.satisfaction=1;
+            else this.satisfaction = 0;
         }
     }
 };
@@ -33,14 +44,18 @@ House.prototype.renderer = function(ctx) {
             ctx.strokeRect(this.x, this.y, this.w, this.h)
         }
     }
+    if (this.satisfaction>=0) {
+        this.sat[this.satisfaction].renderer(ctx, this.x+16, this.y+16)
+    }
 };
 House.prototype.readyToOrder = function() {
+    this.patience = Math.round(this.distanceFrom(g.pizzeria))*4;
     this.state=1; // Waiting to order
+    this.waittime = 0;
     this.flashing = true
     return this
 };
 House.prototype.placeOrder = function() {
-    this.patience = Math.round(this.distanceFrom(g.pizzeria))*20;
     this.state=2; // Waiting for order
     this.flashing = true
     this.waittime = 0;
@@ -49,6 +64,7 @@ House.prototype.placeOrder = function() {
 };
 House.prototype.deliverOrder = function() {
     this.state=0;
+    this.waittime = -1;
     this.flashing=false;
 }
 House.prototype.distanceFrom = function(ent) {

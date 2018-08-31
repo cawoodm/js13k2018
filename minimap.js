@@ -15,7 +15,7 @@ MiniMap.prototype.draw = function(ctx) {
         else if (e.tag=="pizzeria") {
             ctx.fillStyle='magenta';sz=g.manager.flash?3:1;
         }
-        else if (e.flashing && g.manager.flash) {ctx.fillStyle=House.colors[e.state];sz=3}
+        else if (e.flashing && g.manager.flash) {ctx.fillStyle=House.colors[e.state];sz=2}
         else ctx.fillStyle='rgba(100,100,100,0.75)'
         ctx.fillRect(g.camera.x+x-sz/2,g.camera.y+y-sz/2, sz, sz)
     });

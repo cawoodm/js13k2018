@@ -3,7 +3,6 @@ function GameManager(options) {
     this.flash = false;
     this.level = 1;
     this.houses = g.scene.get("house")
-    ArrayShuffle(this.houses)
     this.prospects = []
     this.orders = []
     this.deliveries=0;
@@ -15,7 +14,7 @@ GameManager.prototype.update = function(dt) {
     if (g.ticker.ticks % 30 == 0) this.flash = !this.flash;
     // Every 5s
     if (this.prospects.length+this.orders.length==0 || g.ticker.ticks % (60*5) == 0) {
-        if (this.prospects.length  < 2* this.level) this.getNewHungryHouse();
+        if (this.prospects.length  < 4*this.level) this.getNewHungryHouse();
     }
     this.level=Math.floor(this.deliveries/6)+1;
 }
@@ -55,7 +54,6 @@ GameManager.prototype.getNewHungryHouse = function() {
         if (h.distanceFrom(g.pizzeria) < this.level*6) {possibles.push(h)}
     }
     if (possibles.length==0) return;
-    ArrayShuffle(possibles);
     let h = rnda(possibles)
     g.sound.play("prospect")
     return this.prospects.push(h.readyToOrder())
