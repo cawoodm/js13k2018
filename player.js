@@ -11,6 +11,7 @@ function Player(options) {
     this.speed={x:0, y:0};
     this.velocity = options.velocity || 5;
     this.frame=0;
+    this.fuel=100;
     this.carrying=[];
     g.collider.check(this, ["house", "block"], (e1, e2)=>{g.player.stop()}) 
     return this;
@@ -22,6 +23,7 @@ Player.prototype.update = function(delta) {
     this.speed.y += this.acc.y * delta;
     this.x += this.speed.x;// * delta;
     this.y += this.speed.y;//    * delta;
+    if (this.speed.x+this.speed.y>0) this.fuel-=0.03;
     if (this.speed.x>0) this.frame=0;
     else if (this.speed.x<0) this.frame=1;
     else if (this.speed.y<0) this.frame=2;

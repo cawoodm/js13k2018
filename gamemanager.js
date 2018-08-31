@@ -50,6 +50,7 @@ GameManager.prototype.getNewHungryHouse = function() {
     for (i=0; i<this.houses.length; i++) {
         let h = this.houses[i];
         if (this.prospects.includes(h) || this.orders.includes(h)) continue;
+        if (h.satisfaction==0) continue;
         // Is this house within 5 x level blocks of the pizzeria?
         if (h.distanceFrom(g.pizzeria) < this.level*6) {possibles.push(h)}
     }

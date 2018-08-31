@@ -1,7 +1,8 @@
 g.sound = {
-    prospect: [11,11],
-    order: [11,6,5],
+    prospect: [11,11,11,11,11],
+    order: [4,6,5],
     delivery: [11,6,5],
+    lost: [17,19,22],
 }
 g.sound.play = function(snd, tempo, tone) {
     tempo = tempo/1000 || .09

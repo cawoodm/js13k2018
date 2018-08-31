@@ -217,7 +217,7 @@ g.GameUpdate = function(delta) {
     if (typeof g.postGameUpdate=="function") g.postGameUpdate();
 };
 g.GameRender = function() {
-	g.ctx.clearRect(0, 0, g.ui.win.width/g.ui.scale.x, g.ui.win.height/g.ui.scale.y);
+	g.ctx.clearRect(0, 0, g.ui.canvas.width, g.ui.canvas.height);
 	g.ctx.save();
     if (typeof g.preGameRender=="function") {
 		g.ctx.save();

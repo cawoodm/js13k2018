@@ -26,11 +26,19 @@ House.prototype.update = function(dt) {
         if (this.waittime>=0) {
             if (this.waittime/this.patience<0.5) this.satisfaction=2;
             else if (this.waittime < this.patience) this.satisfaction=1;
+            else if (this.waittime/this.patience>3 && this.state==1) {
+                // Lost customer
+                this.state = 3;
+                this.satisfaction = 0;
+                this.flashing = false
+                ArrayRemove(g.manager.prospects, this);
+                g.sound.play("lost")
+            }
             else this.satisfaction = 0;
         }
     }
 };
-House.colors=['', 'white', 'blue', 'red'];
+House.colors=['', 'white', 'blue', 'orange'];
 House.prototype.renderer = function(ctx) {
     if (this.flashing && g.manager.flash) {
         if (this.state==1) {
@@ -38,11 +46,12 @@ House.prototype.renderer = function(ctx) {
         } else if (this.state==2) {
             this.orderedSprite.renderer(ctx, this.x, this.y)
             arc(ctx, this.x+12, this.y+11, 5, this.waittime/this.patience, '#4B1716')
-        } else {
-            ctx.strokeStyle = House.colors[this.state]
-            ctx.lineWidth='2';
-            ctx.strokeRect(this.x, this.y, this.w, this.h)
         }
+    }
+    if (this.state==3) {
+        ctx.strokeStyle = House.colors[this.state]
+        ctx.lineWidth='2';
+        ctx.strokeRect(this.x, this.y, this.w, this.h)
     }
     if (this.satisfaction>=0) {
         this.sat[this.satisfaction].renderer(ctx, this.x+16, this.y+16)

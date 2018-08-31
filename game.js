@@ -10,15 +10,17 @@ g.init = function() {
     g.ui.canvas0 = document.createElement("canvas");
     g.ctx0 = g.ui.canvas0.getContext("2d");
     
-    g.ui.hudWidth = 100;
+    g.ui.hudWidth = 50;
     g.ui.scale = {x: 2, y: 2};
-    g.ui.canvas.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.bz*g.ui.scale.x;
-    g.ui.canvas.height=g.ui.blocksInView*g.ui.bz*g.ui.scale.y;
+    g.ui.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.bz;
+    g.ui.canvas.width=g.ui.width*g.ui.scale.x;
+    g.ui.height=g.ui.blocksInView*g.ui.bz;
+    g.ui.canvas.height=g.ui.height*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
     g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.bz*g.ui.scale.y + "px";
 
-	g.ctx.translate(g.ui.hudWidth, 0);
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
+	g.ctx.translate(g.ui.hudWidth, 0);
 	// We want pixelated scaling:
 	g.ctx.imageSmoothingEnabled=false
 
