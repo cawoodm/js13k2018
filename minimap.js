@@ -7,7 +7,7 @@ MiniMap.prototype.draw = function(ctx) {
     ctx.translate(-g.ui.hudWidth, 0)
     ctx.fillStyle='silver';ctx.fillRect(0,0,g.ui.hudWidth,g.ui.height)
     ctx.fillStyle='blue';ctx.fillRect(1,1,g.player.fuel*(g.ui.hudWidth-2)/100, 12)
-    ctx.fillStyle='white';ctx.fillText("Fuel",2,11)
+    ctx.fillStyle='white';ctx.fillText("Fuel " + Math.round(g.player.fuel),2,11)
     ctx.translate(0, 100)
     ctx.fillStyle='rgba(0,0,0,0.8)'
     ctx.translate(4, 2)

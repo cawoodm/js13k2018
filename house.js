@@ -9,12 +9,6 @@ function House(options) {
     this.state = 0;
     this.waittime = -1;
     this.satisfaction = -1;
-    this.readySprite = new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*4, offY: 32*1});
-    this.orderedSprite = new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*5, offY: 32*1});
-    this.sat = [new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*5, offY: 32*2}),
-        new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*6, offY: 32*2}),
-        new Sprite({sprite: "spritemap", w: 32, h: 32, offX: 32*4, offY: 32*2})
-    ];
     return this;
 };
 House.prototype.update = function(dt) {
@@ -42,10 +36,12 @@ House.colors=['', 'white', 'blue', 'orange'];
 House.prototype.renderer = function(ctx) {
     if (this.flashing && g.manager.flash) {
         if (this.state==1) {
-            this.readySprite.renderer(ctx, this.x, this.y)
+            g.sprites.cloud.renderer(ctx, this.x, this.y)
+            g.sprites.pizza.renderer(ctx, this.x+6, this.y+4)
         } else if (this.state==2) {
-            this.orderedSprite.renderer(ctx, this.x, this.y)
-            arc(ctx, this.x+12, this.y+11, 5, this.waittime/this.patience, '#4B1716')
+            g.sprites.cloud.renderer(ctx, this.x, this.y)
+            g.sprites.pizza.renderer(ctx, this.x+6, this.y+4)
+            arc(ctx, this.x+13, this.y+11, 5, this.waittime/this.patience, '#4B1716')
         }
     }
     if (this.state==3) {
@@ -54,11 +50,11 @@ House.prototype.renderer = function(ctx) {
         ctx.strokeRect(this.x, this.y, this.w, this.h)
     }
     if (this.satisfaction>=0) {
-        this.sat[this.satisfaction].renderer(ctx, this.x+16, this.y+16)
+        g.sprites.sat[this.satisfaction].renderer(ctx, this.x+16, this.y+16)
     }
 };
 House.prototype.readyToOrder = function() {
-    this.patience = Math.round(this.distanceFrom(g.pizzeria))*4;
+    this.patience = Math.round(this.distanceFrom(g.pizzeria))*5;
     this.state=1; // Waiting to order
     this.waittime = 0;
     this.flashing = true

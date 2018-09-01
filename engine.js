@@ -91,10 +91,11 @@ function Sprite(options) {
     this.img = g.ImageLoader.get[options.sprite||"sprites"];
     return this;
 }
-Sprite.prototype.renderer = function(ctx, x, y) {
+Sprite.prototype.renderer = function(ctx, x, y, scale) {
 	ctx.save();
 	this.x=x||this.x;
 	this.y=y||this.y;
+	this.scale=scale||this.scale;
     this.offW = this.w * this.scale;
     this.offH = this.h * this.scale;
     if (this.center) g.ctx.translate(-this.offW/2, -this.offH/2)

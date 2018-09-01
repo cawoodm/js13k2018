@@ -17,7 +17,8 @@ g.init = function() {
     g.ui.height=g.ui.blocksInView*g.ui.bz;
     g.ui.canvas.height=g.ui.height*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
-    g.ui.canvas.style.left = 0.5*g.ui.blocksInView*g.ui.bz*g.ui.scale.y + "px";
+    g.ui.canvas.style.left = g.ui.win.width/2-0.5*g.ui.width*g.ui.scale.x + "px";
+    g.ui.canvas.style.top = g.ui.win.height/2-0.5*g.ui.width*g.ui.scale.y + "px";
 
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
 	g.ctx.translate(g.ui.hudWidth, 0);
@@ -25,7 +26,7 @@ g.init = function() {
 	g.ctx.imageSmoothingEnabled=false
 
 	g.ImageLoader.add("tilemap", "./tilemap.png");
-	g.ImageLoader.add("spritemap", "./spritemap.png");
+	g.ImageLoader.add("sprites", "./spritemap.png");
 
 	return ()=>{g.ready()}
 }
@@ -127,25 +128,31 @@ g.drawMap = function() {
 
     ctx.fillStyle='#DDD';
     ctx.fillRect(0, 0, g.ui.canvas0.width, g.ui.canvas0.height);
-    let spriteSheet = g.ImageLoader.get["spritemap"];
+    let spriteSheet = g.ImageLoader.get["sprites"];
     
     // Land background is green
-    ctx.globalAlpha=0.7;
+    //ctx.globalAlpha=0.7;
     for (let y = 0; y < mapHeight; y++)
         for (let x = 0; x < mapWidth; x++)
-            if (g.map[y][x]>2) // If not landscape
-                ctx.drawImage(spriteSheet, 2*spriteSize, 0, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
+            if (g.map[y][x]==3) // House, draw green square
+                ctx.drawImage(spriteSheet, 2*spriteSize, 3*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
+            else if (g.map[y][x]>=2) // If not sea, sand draw grass
+                ctx.drawImage(spriteSheet, 2*spriteSize, 0*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
     for (let y = 0; y < mapHeight; y++)
         for (let x = 0; x < mapWidth; x++) {
             ctx.globalAlpha=1;
             let y1 = 0;
             let y2 = 1;
-            let y3 = 0;
+            // Don't put any block to the right of the pizzeria
+            if (x>0 && g.map[y][x-1]==15) {
+                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
+                continue;
+            }
             let rand = Math.random();
             // Sea, Sand and Grass alpha variations
             if (g.map[y][x]==0) ctx.globalAlpha=0.9 + rand*0.1;
-            if (g.map[y][x]==1) ctx.globalAlpha=0.5 + rand*0.4;
-            if (g.map[y][x]==2) ctx.globalAlpha=0.7 //+ rand*0.3;
+            if (g.map[y][x]==1) ctx.globalAlpha=0.7 + rand*0.2;
+            //if (g.map[y][x]==2) ctx.globalAlpha=0.7 //+ rand*0.3;
             if (g.map[y][x]==0) { // Sea variations
                 if (rand<0.25) y1 = 1;
             }
@@ -159,34 +166,33 @@ g.drawMap = function() {
                 else if (rand<0.75) y1 = 3; // Green house
                 else {
                     // Block 
+                    ctx.drawImage(spriteSheet, 2*spriteSize, 0*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
                     g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz})
                     g.map[y][x]=-1 
                     continue; // No house
                 }
+                // Shadow
+                ctx.fillStyle="rgba(70,70,70,0.8)";
+                ctx.fillRect((x+0.8)*spriteSize, (y+0.6)*spriteSize, 0.4*spriteSize, 0.4*spriteSize)
                 g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz}));
             }
             if (g.map[y][x]==2) { // Grass variations
-                ctx.drawImage(spriteSheet, 2*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
-                continue; // No house
-                if (rand<0.5) y1 = 1;
-                else if (rand<0.6) y1 = 2;
-                else if (rand<0.7) y1 = 3;
+                if (rand<0.3) y1 = 1; // Tree
+                else if (rand<0.5) y1 = 2; // Bush
+            }
+            if (g.map[y][x]>=4 && g.map[y][x]<=14) { // Road
+                //ctx.drawImage(spriteSheet, 2*spriteSize, 3*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
             }
             if (g.map[y][x]==15) { // Pizzeria
                 g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
-                y2 = 2;
-                y3 = 1;
-            }
-            if (g.map[y][x]==16) { // High building
-                g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
-                y2 = 2;
-                y3 = 1;
+                ctx.drawImage(spriteSheet, 0, 2*spriteSize, spriteSize*2, 2*spriteSize, x*spriteSize, (y-1)*spriteSize, spriteSize*2, spriteSize*2);
+                continue;
             }
             if (g.map[y][x]==17) { // Block
                 g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 continue;
             }
-            ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize-y3*spriteSize, spriteSize, spriteSize*y2);
+            ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize*y2);
         }
 }
 g.ui.keys = {
