@@ -2,13 +2,6 @@
 g.init = function() {
 	g.ui.bz=32
     g.ui.blocksInView=10
-
-    // g.ui.canvas = document.getElementById("c");
-    // g.ctx = g.ui.canvas.getContext("2d");
-
-    // Separate canvas for background (drawn once)
-    g.ui.canvas0 = document.createElement("canvas");
-    g.ctx0 = g.ui.canvas0.getContext("2d");
     
     g.ui.hudWidth = 50;
     g.ui.scale = {x: 2, y: 2};
@@ -52,27 +45,9 @@ g.restart = function(title) {
         g.player = g.scene.add(new Player({x: 28*g.ui.bz, y: 37*g.ui.bz, velocity: 2}));
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
-        g.loadScene();
         g.state="play";
 	}
 	g.Start();
-};
-g.loadScene = function(level) {
-    let mapWidth = g.map[0].length;
-    let mapHeight = g.map.length;
-	for (let y = 0; y < mapHeight; y++) for (let x = 0; x < mapWidth; x++) {switch(g.map[y][x]) {
-		//case 3: g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz})); break;
-		//case -1: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
-		//case 15: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
-		//case 16: g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz}); break;
-	}}
-	return true;
-}
-g.gameWon = function() {
-	// g.state="message";
-	// g.scene.remove(g.collider); //Stop collisions
-	// g.scene.add(new GameWon());
-	// g.sounds.music.pause();g.sounds.music.currentTime=0;
 };
 g.gameOver = function() {
 	// g.state="message";
@@ -83,7 +58,7 @@ g.gameOver = function() {
 };
 g.preGameRender = function(ctx) {
     // Draw background
-    g.ctx.drawImage(g.ui.canvas0, g.camera.x, g.camera.y, 320, 320, 0, 0, 320, 320)
+    g.ctx.drawImage(g.c0, g.camera.x, g.camera.y, 320, 320, 0, 0, 320, 320)
 };
 g.postGameRender = function(ctx) {
     // Draw background
@@ -115,31 +90,31 @@ g.loadMap = function() {
         }
         if (y>0) g.map.push(row)
     }
-    //dp(JSON.stringify(g.map))
 };
+g.rect=function(x,y,w,h,c) {g.ctx.fillStyle=c;g.ctx.fillRect(x,y,w,h)}
 g.drawMap = function() {
-    // Draw static map to hidden canvas0
-    let spriteSize = g.ui.bz;
-    let mapWidth = g.map[0].length;
-    let mapHeight = g.map.length;
-    g.ui.canvas0.width = mapWidth * spriteSize;
-    g.ui.canvas0.height = mapHeight * spriteSize;
-    let ctx = g.ctx0;
+    // Draw static map to hidden c0
+    let bz = g.ui.bz;
+    let mw = g.map[0].length;
+    let mh = g.map.length;
+    let c0 = document.createElement("canvas");g.c0=c0;
+    let ctx = c0.getContext("2d");
+    c0.width = mw * bz;
+    c0.height = mh * bz;
 
-    ctx.fillStyle='#DDD';
-    ctx.fillRect(0, 0, g.ui.canvas0.width, g.ui.canvas0.height);
+    g.rect(0, 0, c0.width, c0.height, '#DDD');
     let spriteSheet = g.ImageLoader.get["sprites"];
     
     // Land background is green
     //ctx.globalAlpha=0.7;
-    for (let y = 0; y < mapHeight; y++)
-        for (let x = 0; x < mapWidth; x++)
+    for (let y = 0; y < mh; y++)
+        for (let x = 0; x < mw; x++)
             if (g.map[y][x]==3) // House, draw green square
-                ctx.drawImage(spriteSheet, 2*spriteSize, 3*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
+                ctx.drawImage(spriteSheet, 2*bz, 3*bz, bz, bz, x*bz, y*bz, bz, bz);
             else if (g.map[y][x]>=2) // If not sea, sand draw grass
-                ctx.drawImage(spriteSheet, 2*spriteSize, 0*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
-    for (let y = 0; y < mapHeight; y++)
-        for (let x = 0; x < mapWidth; x++) {
+                ctx.drawImage(spriteSheet, 2*bz, 0*bz, bz, bz, x*bz, y*bz, bz, bz);
+    for (let y = 0; y < mh; y++)
+        for (let x = 0; x < mw; x++) {
             ctx.globalAlpha=1;
             let y1 = 0;
             let y2 = 1;
@@ -166,14 +141,13 @@ g.drawMap = function() {
                 else if (rand<0.75) y1 = 3; // Green house
                 else {
                     // Block 
-                    ctx.drawImage(spriteSheet, 2*spriteSize, 0*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
+                    ctx.drawImage(spriteSheet, 2*bz, 0*bz, bz, bz, x*bz, y*bz, bz, bz);
                     g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz})
                     g.map[y][x]=-1 
                     continue; // No house
                 }
                 // Shadow
-                ctx.fillStyle="rgba(70,70,70,0.8)";
-                ctx.fillRect((x+0.8)*spriteSize, (y+0.6)*spriteSize, 0.4*spriteSize, 0.4*spriteSize)
+                g.rect((x+0.8)*bz, (y+0.6)*bz, 0.4*bz, 0.4*bz, "rgba(70,70,70,0.8)")
                 g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz}));
             }
             if (g.map[y][x]==2) { // Grass variations
@@ -181,18 +155,18 @@ g.drawMap = function() {
                 else if (rand<0.5) y1 = 2; // Bush
             }
             if (g.map[y][x]>=4 && g.map[y][x]<=14) { // Road
-                //ctx.drawImage(spriteSheet, 2*spriteSize, 3*spriteSize, spriteSize, spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize);
+                //ctx.drawImage(spriteSheet, 2*bz, 3*bz, bz, bz, x*bz, y*bz, bz, bz);
             }
             if (g.map[y][x]==15) { // Pizzeria
                 g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
-                ctx.drawImage(spriteSheet, 0, 2*spriteSize, spriteSize*2, 2*spriteSize, x*spriteSize, (y-1)*spriteSize, spriteSize*2, spriteSize*2);
+                ctx.drawImage(spriteSheet, 0, 2*bz, bz*2, 2*bz, x*bz, (y-1)*bz, bz*2, bz*2);
                 continue;
             }
             if (g.map[y][x]==17) { // Block
                 g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 continue;
             }
-            ctx.drawImage(spriteSheet, g.map[y][x]*spriteSize, y1*spriteSize*y2, spriteSize, y2*spriteSize, x*spriteSize, y*spriteSize, spriteSize, spriteSize*y2);
+            ctx.drawImage(spriteSheet, g.map[y][x]*bz, y1*bz*y2, bz, y2*bz, x*bz, y*bz, bz, bz*y2);
         }
 }
 g.ui.keys = {

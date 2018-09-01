@@ -10,10 +10,8 @@ git add .
 git commit -m %STR%
 git push origin master
 
-
 :: Copy to local cawoodm github site
 COPY /Y *.* ..\..\..\cawoodm.github.io\js13k2018
-COPY /Y resources\*.* ..\..\..\cawoodm.github.io\js13k2018\resources
 
 :: Publish to github
 CD ..\..\..\cawoodm.github.io\js13k2018
