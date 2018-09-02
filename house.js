@@ -19,20 +19,20 @@ House.prototype.update = function(dt) {
         if (this.state==1) this.waittime+=0.5;
         if (this.state==2) this.waittime++;
         
-        if (this.waittime>=0) {
+        if (this.waittime>=0 && this.state<3) {
             if (this.waittime/this.patience<0.5) this.satisfaction=2;
             else if (this.waittime < this.patience) this.satisfaction=1;
             else if (this.waittime/this.patience>3) {
                 // Lost customer
                 if (this.state==1) ArrayRemove(g.manager.prospects, this);
                 else if (this.state==2) {ArrayRemove(g.manager.orders, this);ArrayRemove(g.player.carrying, this);}
+                g.manager.lost.push(this)
                 this.satisfaction = 0;
                 this.waittime = 0;
                 //this.flashing = false
                 this.state = 3;
                 g.sound.play("lost")
             }
-            else this.satisfaction = 0;
         }
     }
 };

@@ -5,6 +5,7 @@ function GameManager(options) {
     this.houses = g.scene.get("house")
     this.prospects = []
     this.orders = []
+    this.lost = []
     this.deliveries=0;
     this.money=0;
     g.sprites = {
