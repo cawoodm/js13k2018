@@ -46,6 +46,7 @@ g.restart = function(title) {
 	    // Mobile version can't have music and sfx
 	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
         g.state="play";
+        g.sound.music.play();
 	}
 	g.Start();
 };
@@ -58,10 +59,12 @@ g.gameOver = function() {
 };
 g.preGameRender = function(ctx) {
     // Draw background
+    if(!g.camera) return;
     g.ctx.drawImage(g.c0, g.camera.x, g.camera.y, 320, 320, 0, 0, 320, 320)
 };
 g.postGameRender = function(ctx) {
     // Draw background
+    if(!g.minimap) return;
     g.minimap.draw(ctx);
 };
 g.loadMap = function() {
@@ -92,6 +95,7 @@ g.loadMap = function() {
     }
 };
 g.rect=function(x,y,w,h,c) {g.ctx.fillStyle=c;g.ctx.fillRect(x,y,w,h)}
+g.rect2=function(x,y,w,h,c) {g.ctx.fillStyle=c;g.ctx.fillRect(x*g.ui.bz,y*g.ui.bz,w*g.ui.bz,h*g.ui.bz)}
 g.drawMap = function() {
     // Draw static map to hidden c0
     let bz = g.ui.bz;
@@ -106,7 +110,6 @@ g.drawMap = function() {
     let spriteSheet = g.ImageLoader.get["sprites"];
     
     // Land background is green
-    //ctx.globalAlpha=0.7;
     for (let y = 0; y < mh; y++)
         for (let x = 0; x < mw; x++)
             if (g.map[y][x]==3) // House, draw green square
@@ -127,14 +130,8 @@ g.drawMap = function() {
             // Sea, Sand and Grass alpha variations
             if (g.map[y][x]==0) ctx.globalAlpha=0.9 + rand*0.1;
             if (g.map[y][x]==1) ctx.globalAlpha=0.7 + rand*0.2;
-            //if (g.map[y][x]==2) ctx.globalAlpha=0.7 //+ rand*0.3;
-            if (g.map[y][x]==0) { // Sea variations
-                if (rand<0.25) y1 = 1;
-            }
-            if (g.map[y][x]==1) { // Sand variations
-                if (rand<0.25) y1 = 1;
-                //g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
-            }
+            if (g.map[y][x]==0 && rand<0.25) y1 = 1; // Sea variations
+            if (g.map[y][x]==1 && rand<0.25) y1 = 1; // Sand variations
             if (g.map[y][x]==3) { // House variations
                 if (rand<0.25) y1 = 1; // Red House
                 else if (rand<0.50) y1 = 2; // Black house
@@ -147,22 +144,22 @@ g.drawMap = function() {
                     continue; // No house
                 }
                 // Shadow
-                g.rect((x+0.8)*bz, (y+0.6)*bz, 0.4*bz, 0.4*bz, "rgba(70,70,70,0.8)")
+                ctx.fillStyle="rgba(70,70,70,0.8)";ctx.fillRect((x+0.8)*bz, (y+0.6)*bz, 0.4*bz, 0.4*bz, )
                 g.scene.add(new House({x: x*g.ui.bz, y: y*g.ui.bz}));
             }
-            if (g.map[y][x]==2) { // Grass variations
+            else if (g.map[y][x]==2) { // Grass variations
                 if (rand<0.3) y1 = 1; // Tree
                 else if (rand<0.5) y1 = 2; // Bush
             }
-            if (g.map[y][x]>=4 && g.map[y][x]<=14) { // Road
+            else if (g.map[y][x]>=4 && g.map[y][x]<=14) { // Road
                 //ctx.drawImage(spriteSheet, 2*bz, 3*bz, bz, bz, x*bz, y*bz, bz, bz);
             }
-            if (g.map[y][x]==15) { // Pizzeria
+            else if (g.map[y][x]==15) { // Pizzeria
                 g.pizzeria = g.scene.add({tag: "pizzeria", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 ctx.drawImage(spriteSheet, 0, 2*bz, bz*2, 2*bz, x*bz, (y-1)*bz, bz*2, bz*2);
                 continue;
             }
-            if (g.map[y][x]==17) { // Block
+            else if (g.map[y][x]==17) { // Block
                 g.scene.add({tag: "block", x: x*g.ui.bz, y: y*g.ui.bz, w: g.ui.bz, h: g.ui.bz});
                 continue;
             }
@@ -198,6 +195,7 @@ g.ui.keys.down.down = function() {
 };
 g.ui.keys.fire.press = function(e) {
 	if (g.state=="message") return;
+	if (g.state=="title") {new AudioContext;return g.restart(false);}
     if (g.state!="play") return g.restart();
     g.manager.vanStops();
 }

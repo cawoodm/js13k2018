@@ -3,15 +3,13 @@ function MiniMap() {
 }
 MiniMap.prototype.draw = function(ctx) {
     ctx.translate(g.camera.x, g.camera.y)
-    // ctx.fillStyle='blue';ctx.fillRect(1,1,1, 1)
     ctx.translate(-g.ui.hudWidth, 0)
-    ctx.fillStyle='silver';ctx.fillRect(0,0,g.ui.hudWidth,g.ui.height)
-    ctx.fillStyle='blue';ctx.fillRect(1,1,g.player.fuel*(g.ui.hudWidth-2)/100, 12)
+    g.rect(0,0,g.ui.hudWidth,g.ui.height,'gray')
+    g.rect(1,1,g.player.fuel*(g.ui.hudWidth-2)/100, 12, 'blue')
     ctx.fillStyle='white';ctx.fillText("Fuel " + Math.round(g.player.fuel),2,11)
     ctx.translate(0, 100)
-    ctx.fillStyle='rgba(0,0,0,0.8)'
     ctx.translate(4, 2)
-    ctx.fillRect(0,0,40,100)
+    g.rect(0,0,40,100,'rgba(0,0,0,0.8)')
     g.scene.get(["player", "pizzeria", "house"]).forEach((e)=> {
         let x = e.x/g.ui.bz;
         let y = e.y/g.ui.bz;

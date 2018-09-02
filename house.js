@@ -11,6 +11,8 @@ function House(options) {
     this.satisfaction = -1;
     return this;
 };
+// House states 0=nothing, 1=waiting to order, 2=ordered, 3=lost customer
+House.colors=['', 'white', 'blue', 'orange'];
 House.prototype.update = function(dt) {
     if (g.ticker.ticks % 60 == 0) {
         // Approx every second
@@ -20,19 +22,20 @@ House.prototype.update = function(dt) {
         if (this.waittime>=0) {
             if (this.waittime/this.patience<0.5) this.satisfaction=2;
             else if (this.waittime < this.patience) this.satisfaction=1;
-            else if (this.waittime/this.patience>3 && this.state==1) {
+            else if (this.waittime/this.patience>3) {
                 // Lost customer
-                this.state = 3;
+                if (this.state==1) ArrayRemove(g.manager.prospects, this);
+                else if (this.state==2) {ArrayRemove(g.manager.orders, this);ArrayRemove(g.player.carrying, this);}
                 this.satisfaction = 0;
-                this.flashing = false
-                ArrayRemove(g.manager.prospects, this);
+                this.waittime = 0;
+                //this.flashing = false
+                this.state = 3;
                 g.sound.play("lost")
             }
             else this.satisfaction = 0;
         }
     }
 };
-House.colors=['', 'white', 'blue', 'orange'];
 House.prototype.renderer = function(ctx) {
     if (this.flashing && g.manager.flash) {
         if (this.state==1) {
