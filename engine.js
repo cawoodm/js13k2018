@@ -104,7 +104,7 @@ Sprite.prototype.renderer = function(ctx, x, y, scale) {
 }
 
 // Keyboard: Input stuff
-function Keyboard(keyCode) {
+g.Keyboard = function(keyCode) {
 	var key = {};
 	key.codes = Array.isArray(keyCode)?keyCode:[keyCode];
 	key.isDown = false;
@@ -250,6 +250,6 @@ g.restart = function(title){dp("No game defined in g.restart(). Start coding!")}
 
 // Wait for page to load, sprites to load and start game
 window.addEventListener("load", function() {
-    let start = g.init();
+	let start = g.init();
 	g.ImageLoader.onload(start);
 });

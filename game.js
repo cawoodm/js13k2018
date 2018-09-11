@@ -2,7 +2,6 @@
 g.init = function() {
 	g.ui.bz=32
     g.ui.blocksInView=10
-    
     g.ui.hudWidth = 50;
     g.ui.scale = {x: 2, y: 2};
     g.ui.width=g.ui.hudWidth+g.ui.blocksInView*g.ui.bz;
@@ -10,8 +9,8 @@ g.init = function() {
     g.ui.height=g.ui.blocksInView*g.ui.bz;
     g.ui.canvas.height=g.ui.height*g.ui.scale.y;
     g.ui.canvas.style.position = "absolute";
-    g.ui.canvas.style.left = g.ui.win.width/2-0.5*g.ui.width*g.ui.scale.x + "px";
-    g.ui.canvas.style.top = g.ui.win.height/2-0.5*g.ui.width*g.ui.scale.y + "px";
+    if (g.ui.win.width>g.ui.width*g.ui.scale.x) g.ui.canvas.style.left = g.ui.win.width/2-0.5*g.ui.width*g.ui.scale.x + "px";
+    if (g.ui.win.height>g.ui.height*g.ui.scale.y) g.ui.canvas.style.top = g.ui.win.height/2-0.5*g.ui.height*g.ui.scale.y + "px";
 
 	g.ctx.scale(g.ui.scale.x, g.ui.scale.y);
 	g.ctx.translate(g.ui.hudWidth, 0);
@@ -32,10 +31,11 @@ g.restart = function(title) {
     g.scene = new g.Scene();
     g.loadMap();
     g.drawMap();
-	g.level=0;
+    g.level=0;
+    g.Start();
 	if (title) {
         g.state="title";
-		g.scene.add(new GameTitle());
+		g.title = g.scene.add(new GameTitle());
 	} else {
         // New Game
         g.camera = g.scene.add(new Camera({x: 24*g.ui.bz, w: g.ui.blocksInView*g.ui.bz, h: g.ui.blocksInView*g.ui.bz, box: 200}));
@@ -43,27 +43,33 @@ g.restart = function(title) {
 		g.manager = g.scene.add(new GameManager());
 		g.minimap = g.scene.add(new MiniMap());
         g.player = g.scene.add(new Player({x: 28*g.ui.bz, y: 37*g.ui.bz, velocity: 2}));
-	    // Mobile version can't have music and sfx
-	    //if (!navigator.userAgent.match(/iPhone|iPod|iPad/)) g.sounds.music.play();
         g.state="play";
-        g.sound.music.play();
 	}
-	g.Start();
+	
 };
-g.gameOver = function() {
-	// g.state="message";
-	// g.scene.remove(g.collider); //Stop collisions
-	// g.scene.add(new GameOver());
-	// g.sounds.music.pause();g.sounds.music.currentTime=0;
-	// g.sounds.lose.play();
-};
+g.GameOver = function(msg) {
+    g.scene.entities.length=0;
+    this.state="gameover"
+    g.msg=msg;
+}
 g.preGameRender = function(ctx) {
     // Draw background
+    if(g.state!="play") return;
     if(!g.camera) return;
     g.ctx.drawImage(g.c0, g.camera.x, g.camera.y, 320, 320, 0, 0, 320, 320)
 };
 g.postGameRender = function(ctx) {
-    // Draw background
+    if (this.state=="gameover") {
+        delete g.camera;
+        g.rect(0, 0, g.ui.width, g.ui.height, '#333')
+        g.ctx.fillStyle='#EEE';
+        g.ctx.font='20pt Consolas';
+        g.ctx.fillText("GAME OVER", 40, g.ui.height/2-10);
+        g.ctx.font='12pt Consolas';
+        g.ctx.fillText(g.msg, 20, g.ui.height/2+20);
+        g.ctx.fillText("Press <SPACEBAR> to play again...", 20, g.ui.height/2+40);
+        return
+    }
     if(!g.minimap) return;
     g.minimap.draw(ctx);
 };
@@ -95,7 +101,6 @@ g.loadMap = function() {
     }
 };
 g.rect=function(x,y,w,h,c) {g.ctx.fillStyle=c;g.ctx.fillRect(x,y,w,h)}
-g.rect2=function(x,y,w,h,c) {g.ctx.fillStyle=c;g.ctx.fillRect(x*g.ui.bz,y*g.ui.bz,w*g.ui.bz,h*g.ui.bz)}
 g.drawMap = function() {
     // Draw static map to hidden c0
     let bz = g.ui.bz;
@@ -130,8 +135,6 @@ g.drawMap = function() {
             // Sea, Sand and Grass alpha variations
             if (g.map[y][x]==0) ctx.globalAlpha=0.9 + rand*0.1;
             if (g.map[y][x]==1) ctx.globalAlpha=0.7 + rand*0.2;
-            if (g.map[y][x]==0 && rand<0.25) y1 = 1; // Sea variations
-            if (g.map[y][x]==1 && rand<0.25) y1 = 1; // Sand variations
             if (g.map[y][x]==3) { // House variations
                 if (rand<0.25) y1 = 1; // Red House
                 else if (rand<0.50) y1 = 2; // Black house
@@ -167,11 +170,11 @@ g.drawMap = function() {
         }
 }
 g.ui.keys = {
-	left: Keyboard(["KeyA", "ArrowLeft"]) // left arrow
-	,right: Keyboard(["KeyD", "ArrowRight"]) // right arrow
-	,up: Keyboard(["KeyW", "ArrowUp"])
-	,down: Keyboard(["KeyS", "ArrowDown"])
-	,fire: Keyboard("Space") // space
+	left: g.Keyboard(["KeyA", "ArrowLeft"]) // left arrow
+	,right: g.Keyboard(["KeyD", "ArrowRight"]) // right arrow
+	,up: g.Keyboard(["KeyW", "ArrowUp"])
+	,down: g.Keyboard(["KeyS", "ArrowDown"])
+	,fire: g.Keyboard("Space") // space
 };
 g.ui.keys.left.down = function() {
     if (g.state=="pause") return g.Pause();
@@ -195,7 +198,7 @@ g.ui.keys.down.down = function() {
 };
 g.ui.keys.fire.press = function(e) {
 	if (g.state=="message") return;
-	if (g.state=="title") {new AudioContext;return g.restart(false);}
+	if (g.state=="title") {return g.title.nextFrame();}
     if (g.state!="play") return g.restart();
     g.manager.vanStops();
-}
+};

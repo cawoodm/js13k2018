@@ -15,10 +15,3 @@ g.sound.play = function(snd, tempo, tone) {
         gain.setTargetAtTime(.0001,i*tempo+.08,.005),
         stop(i*tempo+.09)
 }
-g.cplayer = new CPlayer();
-g.cplayer.init(song);
-while(g.cplayer.generate() < 1) dp("waiting")
-g.sound.wave = g.cplayer.createWave();
-g.sound.music = document.createElement("audio");
-g.sound.music.src = URL.createObjectURL(new Blob([g.sound.wave], {type: "audio/wav"}));
-g.sound.music.loop=true;

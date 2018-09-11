@@ -12,7 +12,6 @@ function Player(options) {
     this.velocity = options.velocity || 5;
     this.frame=0;
     this.fuel=100;
-    this.carrying=[];
     g.collider.check(this, ["house", "block"], (e1, e2)=>{g.player.stop()}) 
     return this;
 }
@@ -24,7 +23,7 @@ Player.prototype.update = function(delta) {
     this.speed.y += this.acc.y * delta;
     this.x += this.speed.x;// * delta;
     this.y += this.speed.y;//    * delta;
-    if (this.speed.x+this.speed.y>0) this.fuel-=0.03;
+    if (this.speed.x!=0 || this.speed.y!=0) this.fuel-=0.03;
     if (this.speed.x>0) this.frame=0;
     else if (this.speed.x<0) this.frame=1;
     else if (this.speed.y<0) this.frame=2;
@@ -35,7 +34,7 @@ Player.prototype.renderer = function(ctx) {
     this.sprite.y=this.y;
     this.sprite.offX=g.ui.bz*4+this.frame*(g.ui.bz);
     this.sprite.renderer(ctx);
-    this.carrying.forEach((p,i)=>{
+    g.manager.carrying.forEach((p,i)=>{
         let o = {x: 14, y: 7, xi:-3, yi:0};
         if (this.frame==1) o = {x: 10, y:-2, xi:3, yi:0}
         else if (this.frame==2) o = {x: 19, y:7, xi:0, yi:3}

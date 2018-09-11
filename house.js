@@ -7,42 +7,37 @@ function House(options) {
     this.lastFlash = 0  ;
     this.flashing = false;
     this.state = 0;
+    this.customer = false;
     this.waittime = -1;
     this.satisfaction = -1;
     return this;
 };
 // House states 0=nothing, 1=waiting to order, 2=ordered, 3=lost customer
-House.colors=['', 'white', 'blue', 'orange'];
+House.colors=['', 'white', 'blue', 'red'];
 House.prototype.update = function(dt) {
     if (g.ticker.ticks % 60 == 0) {
         // Approx every second
         if (this.state==1) this.waittime+=0.5;
         if (this.state==2) this.waittime++;
-        
+        if (this.debug) debugger;
         if (this.waittime>=0 && this.state<3) {
             if (this.waittime/this.patience<0.5) this.satisfaction=2;
             else if (this.waittime < this.patience) this.satisfaction=1;
-            else if (this.waittime/this.patience>3) {
-                // Lost customer
-                if (this.state==1) ArrayRemove(g.manager.prospects, this);
-                else if (this.state==2) {ArrayRemove(g.manager.orders, this);ArrayRemove(g.player.carrying, this);}
-                g.manager.lost.push(this)
-                this.satisfaction = 0;
-                this.waittime = 0;
-                //this.flashing = false
-                this.state = 3;
-                g.sound.play("lost")
-            }
+            else if (this.waittime/this.patience>3) g.manager.loseCustomer(this);
         }
     }
 };
 House.prototype.renderer = function(ctx) {
     if (this.flashing && g.manager.flash) {
         if (this.state==1) {
+            ctx.globalAlpha=0.5;
             g.sprites.cloud.renderer(ctx, this.x, this.y)
+            ctx.globalAlpha=1;
             g.sprites.pizza.renderer(ctx, this.x+6, this.y+4)
         } else if (this.state==2) {
+            ctx.globalAlpha=0.5;
             g.sprites.cloud.renderer(ctx, this.x, this.y)
+            ctx.globalAlpha=1;
             g.sprites.pizza.renderer(ctx, this.x+6, this.y+4)
             arc(ctx, this.x+13, this.y+11, 5, this.waittime/this.patience, '#4B1716')
         }
@@ -73,6 +68,7 @@ House.prototype.placeOrder = function() {
 House.prototype.deliverOrder = function() {
     this.state=0;
     this.waittime = -1;
+    this.customer = true;
     this.flashing=false;
 }
 House.prototype.distanceFrom = function(ent) {
